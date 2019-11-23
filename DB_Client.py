@@ -6,7 +6,7 @@ import time
 import threading
 import os
 
-FIRST_AND_HELP_MESSAGE = 'Hi, and welcome to Tomer\'s server database\r\n' \
+FIRST_AND_HELP_MESSAGE = '\r\nHi, and welcome to Tomer\'s server database\r\n' \
                          'You can choose between many different requests from the database. Would you like to:\r\n' \
                          'Write to the database (enter a key in the database and can change the value of it) - press w'\
                          '\r\nRead from the database (enter a key and get the value of it) - press r\r\n' \
@@ -16,23 +16,45 @@ FIRST_AND_HELP_MESSAGE = 'Hi, and welcome to Tomer\'s server database\r\n' \
                          'For help - press h.\r\n'
 
 
-def write_to_database(c, char_request):
+def write_to_database(c, request):
     """This function is called when the user is in write mode and he wants to write to a specific key"""
-    print 'User is in write mode'
+    request = 'write'  # The server and further_input need add instead of a
+    c.send_to_server(request)  # The client is in write mode
+    further_input(c, request)
+    return True
 
 
-def read_from_database(c, char_request):
+def read_from_database(c, request):
     """This function is called when the user is in read mode and he wants to write to a specific key"""
-    print 'User is in read mode'
+    request = 'read'  # The server and further_input need add instead of a
+    c.send_to_server(request)  # The client is is read mode
+    further_input(c, request)
+    return True
 
 
-def add_to_database(c, char_request):
+def add_to_database(c, request):
     """This function is called when the user is in add mode and wants to add a key and a value to the database"""
-    print 'User is in add mode'
+    request = 'add'  # The server and further_input need add instead of a
+    c.send_to_server(request)  # The client is in add mode
+    further_input(c, request)
+    return True
 
-# def further_input(c, char_request):
-#     """This function is used when three is a need for further input, for example in write mode the key and value"""
-#     if
+
+def further_input(client, request):
+    """This function is used when three is a need for further input, for example in write mode the key and value"""
+    if request == 'write' or request == 'add':
+        client.send_to_server(raw_input("Please enter the request for database using this format key:value\r\n"
+                                        "Enter here: "))
+    elif request is 'read':
+        client.send_to_server(raw_input("Please enter the key that you want to get the value of: "))
+
+    server_output = client.get_server_output()
+    while 'ERROR' in server_output:
+        print server_output
+        client.send_to_server(raw_input('Enter here: '))  # Sending again
+        server_output = client.get_server_output()
+    print server_output
+
 
 def quit_view_help(c, char_request):
     """This function is called when the user requested either quit view or help, which means he does not need any extra
@@ -45,12 +67,8 @@ def quit_view_help(c, char_request):
         os._exit(1)  # closing the client's program so that he won't get an error
     elif char_request == 'v':  # The user has requested to view the whole database
         c.send_to_server('view')
-        print 'Here is the dictionary database: ' + c.get_server_output()
+        print 'Here is the dictionary database: ' + c.get_server_output() + '\r\n'
         # This prints to the client if someone is not writing or adding to it!!!!!!!!!!!!!!!
-    # elif char_request == 'w':
-    #     further_input(c, char_request)
-    # elif char_request == 'r':
-    # elif char_request == 'a'
     return True
 
 
@@ -96,17 +114,20 @@ class Client(object):  # This is the Client class
                 keep_asking = USER_OPTIONS[mode_char](self, mode_char)
                 # Calling the appropriate function based on the user's input. This is sick!!!
             else:
-                print 'ERROR, you did not enter one of the supported modes. Modes avaiable: w, r, a, v, q, h\r\n'
+                print 'ERROR, you did not enter one of the supported modes. Modes available: w, r, a, v, q, h\r\n'
 
     def get_server_output(self):
         server_output = self.server_socket.recv(1024)
-        if 'Please wait' not in server_output:  # If the server actually returned an ok and requested output.
-            return server_output
-        self.get_server_output()  # Getting output again
+        printed_wait_once = False
+        while 'Please wait' in server_output:
+            if not printed_wait_once:
+                print server_output
+            server_output = self.server_socket.recv(1024)  # Getting the output again
+        return server_output
 
     def send_to_server(self, data_to_send):
         """This function..."""
-        self.server_socket.send(data_to_send)  #sending the final user request to the server
+        self.server_socket.send(data_to_send)  # Sending the final user request to the server
 
 
 if __name__ == '__main__':
