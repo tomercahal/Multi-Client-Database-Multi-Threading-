@@ -16,7 +16,7 @@ class Server (object):  # This is server class
         self.dict = {}  # The dict that will be updated each time, from unpickling
         self.database_file = 'database.txt'  # The file where the pickled dictionary is located
         self.active_users = []  # This is a list containing hte threads that are active and if there are any open
-        self.users_allowed = 2  # This is the amount of users that are allowed to be logged in at the same time
+        self.users_allowed = 10  # This is the amount of users that are allowed to be logged in at the same time
         self.sem = threading.Semaphore(self.users_allowed)  # users allowed is a variable making the program dynamic
 
     def read_from_database(self, client_socket, thread_num):
