@@ -1,9 +1,4 @@
 import socket
-import time
-import multiprocessing
-import hashlib
-import time
-import threading
 import os
 
 FIRST_AND_HELP_MESSAGE = '\r\nHi, and welcome to Tomer\'s server database\r\n' \
@@ -49,9 +44,8 @@ def further_input(client, request):
         client.send_to_server(raw_input("Please enter the key that you want to get the value of: "))
 
     server_output = client.get_server_output()
-    while 'ERROR' in server_output:
+    while 'Please wait' in server_output:
         print server_output
-        client.send_to_server(raw_input('Enter here: '))  # Sending again
         server_output = client.get_server_output()
     print server_output
 
@@ -117,6 +111,8 @@ class Client(object):  # This is the Client class
                 print 'ERROR, you did not enter one of the supported modes. Modes available: w, r, a, v, q, h\r\n'
 
     def get_server_output(self):
+        """This function returns the output of the server and checks if the server has sent the please wait
+        message which is used to tell all of the sockets are full and the user has to wait."""
         server_output = self.server_socket.recv(1024)
         printed_wait_once = False
         while 'Please wait' in server_output:
@@ -126,7 +122,8 @@ class Client(object):  # This is the Client class
         return server_output
 
     def send_to_server(self, data_to_send):
-        """This function..."""
+        """This function just sends data to the server, it uis used all over the client's code,
+        it makes the code cleaner. Input: Just enter some data."""
         self.server_socket.send(data_to_send)  # Sending the final user request to the server
 
 
