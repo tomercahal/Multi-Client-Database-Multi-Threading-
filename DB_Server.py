@@ -16,7 +16,7 @@ class Server (object):  # This is server class
         self.dict = {}  # The dict that will be updated each time, from unpickling
         self.database_file = 'database.txt'  # The file where the pickled dictionary is located
         self.active_users = []  # This is a list containing hte threads that are active and if there are any open
-        self.users_allowed = 10  # This is the amount of users that are allowed to be logged in at the same time
+        self.users_allowed = 2  # This is the amount of users that are allowed to be logged in at the same time
         self.sem = threading.Semaphore(self.users_allowed)  # users allowed is a variable making the program dynamic
 
     def read_from_database(self, client_socket, thread_num):
@@ -110,7 +110,7 @@ class Server (object):  # This is server class
         if 'quit' == message:
             client_sock.send('You have been successfully disconnected')
             self.sem.release()  # Clearing up the user's used thread for new available clients
-            self.active_users[thread_num-1] = 0
+            self.active_users[thread_num-1] = 0  # -1 because indexes start at 0
             print 'User has been successfully disconnected ' + str(self.sem._Semaphore__value) + ' sockets left\r\n'
             return None
 
@@ -143,7 +143,7 @@ class Server (object):  # This is server class
         It is set as zero (it means that there isn't someone using that socket, else if there is a number then
         it is in use"""
         for user in range(self.users_allowed):
-            self.active_users.append(0) # making all of the active users slot value, zero
+            self.active_users.append(0)  # making all of the active users slot value, zero
 
     def start(self):
         """Another main function in the server side, It is mainly used to aceept new clients through creating sockets
@@ -157,11 +157,11 @@ class Server (object):  # This is server class
             sock.bind((self.IP, self.PORT))
             sock.listen(1)
             while True:
-                print('Waiting for a new client')
+                print('\r\nWaiting for a new client')
                 client_socket, client_address = sock.accept()  # Last step of being on a socket
                 print('New client entered!')
                 client_socket.sendall('Hello this is Tomer\'s server'.encode())  # First connection message
-                thread_number = self.connect_client(client_socket)
+                thread_number = self.connect_client(client_socket)  # This function
                 thread = threading.Thread(target=self.handle_thread, args=(client_socket, thread_number))
                 thread.start()
 

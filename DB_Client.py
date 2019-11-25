@@ -37,17 +37,21 @@ def add_to_database(c, request):
 
 def further_input(client, request):
     """This function is used when three is a need for further input, for example in write mode the key and value"""
-    if request == 'write' or request == 'add':
-        client.send_to_server(raw_input("Please enter the request for database using this format key:value\r\n"
-                                        "Enter here: "))
-    elif request is 'read':
-        client.send_to_server(raw_input("Please enter the key that you want to get the value of: "))
+    further_input_no_error = False
+    while not further_input_no_error:
+        if request == 'write' or request == 'add':
+            client.send_to_server(raw_input("Please enter the request for database using this format key:value\r\n"
+                                            "Enter here: "))
+        elif request is 'read':
+            client.send_to_server(raw_input("Please enter the key that you want to get the value of: "))
 
-    server_output = client.get_server_output()
-    while 'Please wait' in server_output:
-        print server_output
         server_output = client.get_server_output()
-    print server_output
+        while 'Please wait' in server_output:
+            print server_output
+            server_output = client.get_server_output()
+        if 'ERROR' not in server_output:
+            further_input_no_error = True
+        print server_output
 
 
 def quit_view_help(c, char_request):
@@ -115,7 +119,7 @@ class Client(object):  # This is the Client class
         message which is used to tell all of the sockets are full and the user has to wait."""
         server_output = self.server_socket.recv(1024)
         printed_wait_once = False
-        while 'Please wait' in server_output:
+        while 'Please wait' in server_output:  # The message the server sends if all of the connections are full
             if not printed_wait_once:
                 print server_output
             server_output = self.server_socket.recv(1024)  # Getting the output again
@@ -128,6 +132,5 @@ class Client(object):  # This is the Client class
 
 
 if __name__ == '__main__':
-    run = 0  # since on the other runs we don't need to accept a new socket anymore, we stay connected.
     client = Client()  # Creating a client
     client.start()  # Using the client's start function

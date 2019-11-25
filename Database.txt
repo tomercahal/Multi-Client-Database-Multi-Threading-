@@ -1,21 +1,27 @@
 (dp0
-S'coding'
+S'a'
 p1
-S'fun'
+I1
+sS'c'
 p2
-sS'COOPER'
+I3
+sS'b'
 p3
-S'cute'
+I2
+sS'coding'
 p4
-sS'Tomer'
+S'super fun'
 p5
-S'Cahal'
+sS'dogs'
 p6
-sS'BOOM'
+S'cute'
 p7
-S'explosion'
+sS'Tomer'
 p8
-sS"Tomer's age"
+S'CAHAL'
 p9
-I17
+sS'hello'
+p10
+S'shalom'
+p11
 s.
