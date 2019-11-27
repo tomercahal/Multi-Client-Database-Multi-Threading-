@@ -1,6 +1,6 @@
 # Multi-Client-Database-Multi-Threading-
 In this project I created a multi-client database in python.\
-I used semaphore for handling the threads in order to use multi-threading. I also used pickle in order to have a dictionary as my database.
+I used Sockets for the connections with the clients, semaphore for handling the threads in order to use multi-threading. I also used pickle in order to have a dictionary as my database.
 
 ## To Run: ##
 In this project I used python 2.7. If you want to run this project you will need to have a pickled dictionary in a text file called `database.txt`.\
